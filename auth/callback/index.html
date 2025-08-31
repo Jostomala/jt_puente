@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="referrer" content="no-referrer" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Validando acceso…</title>
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;padding:24px;line-height:1.4}
+    .card{max-width:640px;margin:5vh auto;border:1px solid #ddd;border-radius:16px;padding:24px}
+    .muted{opacity:.75}
+    button{padding:12px 16px;border-radius:12px;border:1px solid #bbb;background:#f7f7f7;cursor:pointer}
+    code{background:#f1f3f5;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Abriendo la aplicación…</h1>
+    <p class="muted">Si no se abre automáticamente, pulsa el botón.</p>
+    <p id="status" class="muted">Preparando enlace profundo…</p>
+    <p><button id="open">Abrir mi app</button></p>
+    <p class="muted">Si tienes problemas, copia y pega este enlace en tu dispositivo con la app instalada:</p>
+    <p><code id="link">myapp://auth-callback</code></p>
+  </div>
+
+  <script>
+    (function(){
+      const params = window.location.search || '';
+      const hash   = window.location.hash || '';
+      const deeplink = 'myapp://auth-callback' + params + hash; // AJUSTA "myapp" y "auth-callback" a tu esquema
+
+      const linkEl = document.getElementById('link');
+      const status = document.getElementById('status');
+      const btn    = document.getElementById('open');
+
+      linkEl.textContent = deeplink;
+
+      function openApp(){ try { window.location.href = deeplink; } catch(e) {} }
+
+      // Intento automático
+      openApp();
+
+      // Fallback visual
+      setTimeout(() => { status.textContent = 'Si no se abrió, pulsa “Abrir mi app”.'; }, 800);
+
+      btn.addEventListener('click', openApp);
+    })();
+  </script>
+</body>
+</html>

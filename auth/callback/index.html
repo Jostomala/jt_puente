@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Correo verificado | Don Chuck</title>
+    <title>Verificacion de correo | Don Chuck</title>
     <style>
       :root { color-scheme: light dark; }
       * { box-sizing: border-box; }
@@ -34,7 +34,13 @@
         border-radius: 50%;
         background: #14321f;
         border: 1px solid #215a35;
-        font-size: 34px;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+      .status-error .ok {
+        background: #321414;
+        border-color: #5a2121;
       }
       h1 { font-size: 22px; margin: 10px 0 6px; }
       p { margin: 6px 0 0; opacity: .9; }
@@ -42,11 +48,69 @@
     </style>
   </head>
   <body>
-    <main class="card" role="main" aria-live="polite">
-      <div class="ok" aria-hidden="true">✔</div>
-      <h1>¡Correo verificado!</h1>
-      <p>Tu cuenta fue confirmada correctamente.</p>
-      <p class="muted">Ya puedes cerrar esta página y volver a la app para iniciar sesión.</p>
+    <main class="card" id="card" role="main" aria-live="polite">
+      <div class="ok" id="icon" aria-hidden="true">OK</div>
+      <h1 id="title">Correo verificado</h1>
+      <p id="message">Tu cuenta fue confirmada correctamente.</p>
+      <p class="muted" id="hint">Ya puedes cerrar esta pagina y volver a la app para iniciar sesion.</p>
     </main>
+    <script>
+      (function () {
+        function parseParams() {
+          var params = new URLSearchParams(window.location.search || '');
+          var hash = window.location.hash || '';
+          var qIndex = hash.indexOf('?');
+          if (qIndex !== -1) {
+            var hashParams = new URLSearchParams(hash.slice(qIndex + 1));
+            hashParams.forEach(function (value, key) {
+              if (!params.has(key)) params.set(key, value);
+            });
+          }
+          return params;
+        }
+
+        var params = parseParams();
+        var error = params.get('error');
+        var errorCode = params.get('error_code');
+        var errorDesc = params.get('error_description');
+        var code = params.get('code');
+
+        var card = document.getElementById('card');
+        var title = document.getElementById('title');
+        var message = document.getElementById('message');
+        var hint = document.getElementById('hint');
+
+        if (error || errorCode) {
+          card.classList.add('status-error');
+          document.title = 'Enlace no valido | Don Chuck';
+          if (errorCode === 'otp_expired') {
+            title.textContent = 'Enlace expirado';
+            message.textContent = 'El enlace de verificacion expiro.';
+          } else {
+            title.textContent = 'No se pudo verificar';
+            message.textContent = 'El enlace no es valido o ya fue usado.';
+          }
+          if (errorDesc) {
+            hint.textContent = decodeURIComponent(errorDesc.replace(/\+/g, ' '));
+          } else {
+            hint.textContent = 'Solicita un nuevo correo de verificacion e intenta otra vez.';
+          }
+          return;
+        }
+
+        if (code) {
+          document.title = 'Correo verificado | Don Chuck';
+          title.textContent = 'Correo verificado';
+          message.textContent = 'Tu cuenta fue confirmada correctamente.';
+          hint.textContent = 'Ya puedes cerrar esta pagina y volver a la app para iniciar sesion.';
+          return;
+        }
+
+        document.title = 'Verificacion pendiente | Don Chuck';
+        title.textContent = 'Verificando enlace';
+        message.textContent = 'No detectamos parametros de verificacion.';
+        hint.textContent = 'Si el problema persiste, solicita un nuevo correo.';
+      })();
+    </script>
   </body>
 </html>

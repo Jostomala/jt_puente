@@ -1,7 +1,8 @@
 {
-  "rewrites": [
-    { "source": "/auth/callback", "destination": "/auth/callback/index.html" },
-    { "source": "/auth/callback/", "destination": "/auth/callback/index.html" }
+  "routes": [
+    { "src": "/auth/callback", "dest": "/auth/callback/index.html" },
+    { "src": "/auth/callback/.*", "dest": "/auth/callback/index.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ],
   "headers": [
     {
